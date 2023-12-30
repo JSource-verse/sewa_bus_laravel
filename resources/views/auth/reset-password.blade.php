@@ -1,36 +1,63 @@
-<x-guest-layout>
-    <x-authentication-card>
-        <x-slot name="logo">
-            <x-authentication-card-logo />
-        </x-slot>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
+    <link rel="stylesheet" href="{{ asset ( 'lte/dist/css/adminlte.min.css') }}">
+    <link rel="stylesheet" href="{{ asset ( 'lte/dist/css/style.css') }}">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <title>SI-POLAR</title>
+</head>
+<body>
+ <div class="wrapper  ">
+    <nav class="nav">
+        <div class="nav-logo">
+        <p><b>SIP-POLAR</b></p>
+        </div>
+    </nav>
 
-        <x-validation-errors class="mb-4" />
 
-        <form method="POST" action="{{ route('password.update') }}">
-            @csrf
+<!----------------------------- Form box ----------------------------------->
+    <div class="form-box">
+        <div class="login-container" id="login">
+            <h3 style="text-align: center; color: white; margin-bottom: 20px;">
+                Form Forgot Password
+            </h3>
+            <form action="{{ route("password.update") }}" method="post">
+              @csrf
+              <input type="hidden" name="token" value="{{ $request->route('token') }}">
+                <div class="input-box">
+                    <input type="text" name="email" value="{{ old('email', $request->email) }}" class="input-field" placeholder="Isi dengan Email"">
+                    <i class="bx bx-user"></i>
+                </div>
+                 <div class="input-box">
+                    <input type="password" name="password" class="input-field">
+                    <i class="bx bx-lock-alt"></i>
+                </div>
+                 <div class="input-box">
+                    <input type="password" name="password_confirmation" class="input-field">
+                    <i class="bx bx-lock-alt"></i>
+                </div>
+                <div class="input-box">
+                    <input type="submit" class="submit" value="Reset Password">
+                </div>
+            </form>
+        </div>
+        <div class="d-flex flex-column-reverse" style="margin-top: 450px; color: white;">
+        <x-validation-errors class="mb-4 d-flex flex-column align-items-center" style="color: white;" />
 
-            <input type="hidden" name="token" value="{{ $request->route('token') }}">
-
-            <div class="block">
-                <x-label for="email" value="{{ __('Email') }}" />
-                <x-input id="email" class="block mt-1 w-full" type="email" name="email" :value="old('email', $request->email)" required autofocus autocomplete="username" />
+        @if (session('status'))
+            <div class="mb-4 font-medium text-sm text-green-600">
+                {{ session('status') }}
             </div>
+        @endif
+        </div>
+    </div>
+</div>
+</body>
+</html>
 
-            <div class="mt-4">
-                <x-label for="password" value="{{ __('Password') }}" />
-                <x-input id="password" class="block mt-1 w-full" type="password" name="password" required autocomplete="new-password" />
-            </div>
 
-            <div class="mt-4">
-                <x-label for="password_confirmation" value="{{ __('Confirm Password') }}" />
-                <x-input id="password_confirmation" class="block mt-1 w-full" type="password" name="password_confirmation" required autocomplete="new-password" />
-            </div>
 
-            <div class="flex items-center justify-end mt-4">
-                <x-button>
-                    {{ __('Reset Password') }}
-                </x-button>
-            </div>
-        </form>
-    </x-authentication-card>
-</x-guest-layout>

@@ -1,4 +1,7 @@
-@extends('logged.layouts.main')
+@extends('logged.layouts.main',  [
+  'nomor_admin' => $website_info->nomor_admin,
+  'sosial_media' => $website_info->sosial_media
+])
 
 
 @section('content')
@@ -56,7 +59,7 @@
           </td>
           <td>
             <div class="d-flex">
-               <a href="{{ route('dashboard.bus.edit', ['id' => $item->id ])}}" class="btn btn-warning">
+              <a href="{{ route('dashboard.bus.edit', ['id' => $item->id ])}}" class="btn btn-warning">
               Edit
             </a>
             <form action="{{ route('dashboard.bus.delete', ['id' => $item->id ]) }}" class="delete-form" method="POST">
@@ -88,15 +91,18 @@
   });
 </script>
 
-<script type="text/javascript">
   @if(Session::has('successEdit'))
-  Swal.fire({
-    title: "Sukses",
-    text: "Sukses Edit Data Bus.",
-    icon: "success",
-    type: "success",
-  });
+    <script>
+      Swal.fire({
+        title: "Sukses",
+        text: "Sukses Edit Data Bus.",
+        icon: "success",
+        type: "success",
+      });
+    </script>
   @endif
+
+<script type="text/javascript">
 
   $(document).ready(function() {
     $('.trigger_button_delete').click(function(e) {
@@ -104,26 +110,31 @@
 
       var form = $(this).closest('form.delete-form');
       Swal.fire({
-        title: "Are you sure?",
-        text: "You won't be able to revert this!",
+        title: "Yakin Ingin Menghapus Bus",
+        text: "Data transaksi bus ini akan ikut terhapus juga",
         icon: "warning",
         showCancelButton: true,
         confirmButtonColor: "#3085d6",
         cancelButtonColor: "#d33",
-        confirmButtonText: "Yes, delete it!"
+        confirmButtonText: "Ya, Lanjutkan",
+        cancelButtonText: "Batal"
       }).then((result) => {
         if (result.isConfirmed) {
           form.submit();
         }
       });
     })
-    @if(Session::has('successDelete'))
+  })
+</script>
+
+@if(Session::has('successDelete'))
+  <script>
     Swal.fire({
       title: "Deleted!",
       text: "Bus Berhasil Di Hapus",
       icon: "success"
     });
-    @endif
-  })
-</script>
+  </script>
+  @endif
+
 @endsection

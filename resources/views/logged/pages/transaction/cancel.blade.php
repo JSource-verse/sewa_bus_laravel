@@ -9,7 +9,7 @@
     <div class="row mb-2">
       <div class="col-sm-6">
         <h1 class="m-0">
-          Daftar Transaksi Sewa Bus
+          Daftar Transaksi Yang Batal
         </h1>
       </div>
       <!-- /.col -->
@@ -25,20 +25,15 @@
           <th>No</th>
           <th>Nama Penyewa</th>
           <th>Nama Bus</th>
-          <th>Tipe</th>
-          <th>
-            Harga Sewa Bus/Hari
-          </th>
-          <th>Tanggal Awal Sewa</th>
-          <th>Tanggal Akhir Sewa</th>
-          <th>Tujuan</th>
-          <th>Penjemputan</th>
           <th>Keterangan</th>
           <th>
             Durasi Sewa
           </th>
           <th>
             Total Pembayaran
+          </th>
+          <th>
+            Alasan Pembatalan
           </th>
           <th>Status</th>
           <th>Bukti Pembayaran</th>
@@ -58,25 +53,6 @@
             {{ $item->bus->nama }}
           </td>
           <td>
-            {{ $item->bus->tipe_bus }}
-          </td>
-          <td>
-            {{ 'Rp. ' . number_format($item->bus->harga, 0,0) }}
-          </td>
-          <td>
-            {{ $item->tanggal_checkin }}
-          </td>
-          <td>
-            {{ $item->tanggal_checkout }}
-          </td>
-          <td>
-            {{ $item->tujuan }}
-          </td>
-          <td>
-            {{ $item->penjemputan }}
-
-          </td>
-          <td>
             {{ $item->keterangan }}
           </td>
           <td>
@@ -86,7 +62,17 @@
             {{ 'Rp. ' . number_format($item->total , 0,0)}}
           </td>
           <td>
-            <div class="badge {{ $item->status === 'menunggu persetujuan' ? 'badge-info' : 'badge-success' }}">
+            {{ $item->alasan }}
+          </td>
+          <td>
+            <div class="badge @if($item->status === 'menunggu persetujuan')
+                  badge-info
+              @elseif($item->status === 'sudah disetujui')
+                  badge-success
+              @else
+                  badge-danger
+              @endif
+          ">
               {{ strtoupper($item->status) }}
             </div>
           </td>
@@ -103,9 +89,9 @@
                 id="form_delete_transaction">
                 @method('POST')
                 @csrf
-                <button type="button" class="btn btn-danger trigger_button_delete">
+                <a href="#" class="btn btn-danger trigger_button_delete">
                   Delete
-                </button>
+                </a>
               </form>
             </div>
           </td>
@@ -127,23 +113,20 @@
       "autoWidth": false,
     }).buttons().container().appendTo('#example1_wrapper .col-md-6:eq(0)');
   });
-</script>
 
-<script>
   $(document).ready(function() {
     $('.trigger_button_delete').click(function(e) {
       e.preventDefault()
 
       var form = $(this).closest('form#form_delete_transaction');
       Swal.fire({
-        title: "Anda Yakin ?",
-        text: "Kamu Tidak Bisa Mengembalikan data yang terhapus !",
+        title: "Are you sure?",
+        text: "You won't be able to revert this!",
         icon: "warning",
         showCancelButton: true,
         confirmButtonColor: "#3085d6",
         cancelButtonColor: "#d33",
-        confirmButtonText: "Ya, Hapus",
-        cancelButtonText: 'Batalkan'
+        confirmButtonText: "Yes, delete it!"
       }).then((result) => {
         if (result.isConfirmed) {
           form.submit();
@@ -153,25 +136,5 @@
 
   })
 </script>
-
-@if(Session::has('successDelete'))
-<script>
-  Swal.fire({
-    title: "Deleted!",
-    text: "Transaksi Berhasil Dihapus",
-    icon: "success"
-  });
-</script>
-@endif
-
-@if(Session::has('successUpdate'))
-<script>
-  Swal.fire({
-    title: "Update!",
-    text: "Transaksi Berhasil Di Update",
-    icon: "success"
-  });
-</script>
-@endif
 
 @endsection

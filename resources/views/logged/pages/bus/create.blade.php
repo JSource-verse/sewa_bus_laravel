@@ -1,4 +1,7 @@
-@extends('logged.layouts.main')
+@extends('logged.layouts.main',  [
+  'nomor_admin' => $website_info->nomor_admin,
+  'sosial_media' => $website_info->sosial_media
+])
 
 
 
@@ -116,15 +119,15 @@
   });
 </script>
 
+@if(Session::has('success'))
 <script type="text/javascript">
-  @if(Session::has('success'))
   Swal.fire({
     title: "Sukses",
     text: "Sukses Menambah Data Bus.",
     icon: "success",
     type: "success",
   });
-  @endif
 </script>
+@endif
 
 @endsection

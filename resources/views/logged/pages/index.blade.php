@@ -1,23 +1,19 @@
-@extends('logged.layouts.main')
+@extends('logged.layouts.main', [
+  'nomor_admin' => $website_info->nomor_admin,
+  'sosial_media' => $website_info->sosial_media
+])
 
 
 @section('content')
 @if(Auth::user()->role === 'admin')
+<style>
+  .active-filter {
+    background-color: gray;
+  }
+</style>
 <!-- Content Header (Page header) -->
 <div class="content-header">
-  <div class="container-fluid">
-    <div class="row mb-2">
-      <div class="col-sm-6">
-        <h1 class="m-0" id="db">Dashboard</h1>
-      </div><!-- /.col -->
-      <div class="col-sm-6">
-        <ol class="breadcrumb float-sm-right">
-          <li class="breadcrumb-item"><a href="#">Home</a></li>
-          <li class="breadcrumb-item active">Dashboard v1</li>
-        </ol>
-      </div><!-- /.col -->
-    </div><!-- /.row -->
-  </div><!-- /.container-fluid -->
+  <h1 class="m-0" id="db">Dashboard</h1>
 </div>
 <!-- /.content-header -->
 <section class="content">
@@ -28,14 +24,15 @@
         <!-- small box -->
         <div class="small-box bg-info">
           <div class="inner">
-            <h3>150</h3>
+            <h3>
+              {{ $transactions }}
+            </h3>
 
-            <p>New Orders</p>
+            <p>Total Transaksi</p>
           </div>
           <div class="icon">
             <i class="ion ion-bag"></i>
           </div>
-          <a href="#" class="small-box-footer">More info <i class="fas fa-arrow-circle-right"></i></a>
         </div>
       </div>
       <!-- ./col -->
@@ -43,14 +40,15 @@
         <!-- small box -->
         <div class="small-box bg-success">
           <div class="inner">
-            <h3>53<sup style="font-size: 20px">%</sup></h3>
+            <h3>
+              {{ $pendingTransactions }}
+            </h3>
 
-            <p>Bounce Rate</p>
+            <p>Transaksi Menunggu Persetujuan</p>
           </div>
           <div class="icon">
             <i class="ion ion-stats-bars"></i>
           </div>
-          <a href="#" class="small-box-footer">More info <i class="fas fa-arrow-circle-right"></i></a>
         </div>
       </div>
       <!-- ./col -->
@@ -58,14 +56,15 @@
         <!-- small box -->
         <div class="small-box bg-warning">
           <div class="inner">
-            <h3>44</h3>
+            <h3>
+              {{ $users }}
+            </h3>
 
-            <p>User Registrations</p>
+            <p>Total User</p>
           </div>
           <div class="icon">
             <i class="ion ion-person-add"></i>
           </div>
-          <a href="#" class="small-box-footer">More info <i class="fas fa-arrow-circle-right"></i></a>
         </div>
       </div>
       <!-- ./col -->
@@ -73,36 +72,147 @@
         <!-- small box -->
         <div class="small-box bg-danger">
           <div class="inner">
-            <h3>65</h3>
+            <h3>
+              {{
+              $cancelTransaction }}
+            </h3>
 
-            <p>Unique Visitors</p>
+            <p>
+              Permintaan Pembatalan Sewa
+            </p>
           </div>
           <div class="icon">
             <i class="ion ion-pie-graph"></i>
           </div>
-          <a href="#" class="small-box-footer">More info <i class="fas fa-arrow-circle-right"></i></a>
         </div>
       </div>
       <!-- ./col -->
     </div>
     <!-- /.row -->
   </div><!-- /.container-fluid -->
+  <div class="d-flex align-items-center justify-content-between" style="margin-right: 50px;">
+  <div></div>
+    <h4 id="chart_title">
+    </h4>
+    <div class="dropdown">
+      <button class="btn btn-warning dropdown-toggle" type="button" data-toggle="dropdown" aria-expanded="false">
+        Filter
+      </button>
+      <div class="dropdown-menu">
+        <button class="dropdown-item" href="#">Perbulan Tahun Ini</button>
+        <div class="p-3">
+          <div class="form-group">
+            <label for="tahun">Tahun</label>
+            <input type="number" class="form-control" id="tahun">
+          </div>
+          <button class="btn btn-primary" id="year-filter-trigger">Cek</button>
+        </div>
+      </div>
+    </div>
+    
+  </div>
+  <div>
+    <canvas id="line-chart" width="100%" height="500px"></canvas>
+  </div>
+  <h4 class="mt-5">
+    Daftar Sewa Semua Bus
+  </h4>
+  <table class="table mt-3">
+  <thead>
+    <tr>
+      <th scope="col">No</th>
+      <th scope="col">Nama Bus</th>
+      <th scope="col">Total Sewa</th>
+    </tr>
+  </thead>
+  <tbody>
+    @foreach($popularBuses as $key => $item)
+    <tr>
+      <td>
+        {{ $key + 1 }}
+      </td>
+      <td>
+        {{ $item->bus->nama }}
+      </td>
+      <td>
+        {{ $item->total_sewa }}
+      </td>
+    </tr>
+    @endforeach
+  </tbody>
+</table>
 </section>
+
+<script src="{{ asset('lte/plugins/jquery/jquery.min.js')}}"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<script>
+  const bulanArray = ["Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober", "November", "Desember"];
+
+
+   var currentYear = new Date().getFullYear();
+   $('#tahun').val(currentYear)
+
+    
+
+    $(document).ready(function(){
+      $('#year-filter-trigger').click()
+    })
+
+  
+    $('#year-filter-trigger').click(function(){
+      var year = $('#tahun').val()
+      $('#chart_title').text(`Total Transaksi dan Total Batal Transaksi Dalam Setiap Bulan Tahun ${year}`)
+      $.ajax({
+        url: '{{ route('getChartData') }}',
+        method: 'GET',
+        dataType: 'json',
+        data: {
+          tahun: parseInt($('#tahun').val())
+        },
+        success: function(data){
+            new Chart(document.getElementById("line-chart"), {
+              type: 'line',
+              data: {
+                labels: bulanArray,
+                datasets: [
+                  {
+                  data: data.totalTransactionInMonth,
+                  label: "Jumlah Transaksi Selesai",
+                  borderColor: "#3cba9f",
+                  fill: false
+                },
+                {
+                  data: data.totalCancelTransactionInMonth,
+                  label: "Jumlah Transaksi Batal",
+                  borderColor: "#000",
+                  fill: false
+                }]
+              },
+              options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                  legend:{
+                    position: 'top'
+                  },
+                  title: {
+                    display: true,
+                    text: `Total Transaksi dan Total Batal Transaksi Dalam Setiap Bulan Tahun ${currentYear}`
+                  }
+                }
+              }
+            });
+        },
+        error: function (error) {
+          console.log(error);
+        }
+      })
+    })
+</script>
 @else
 <div class="content-header">
-  <div class="container-fluid">
-    <div class="row mb-2">
-      <div class="col-sm-6">
-        <h1 class="m-0">Hello, {{ Auth::user()->name }}</h1>
-      </div><!-- /.col -->
-      <div class="col-sm-6">
-        <ol class="breadcrumb float-sm-right">
-          <li class="breadcrumb-item"><a href="#">Home</a></li>
-          <li class="breadcrumb-item active">Dashboard </li>
-        </ol>
-      </div><!-- /.col -->
-    </div><!-- /.row -->
-  </div><!-- /.container-fluid -->
+  <h1 class="m-0">Selamat Datang Kembali, {{ Auth::user()->name }}</h1>
 </div>
 
 <h1>
@@ -111,24 +221,23 @@
 
 <div class="d-flex flex-wrap" style="gap: 20px;">
   @foreach($buses as $item)
-  <div class="card" style="width: 18rem;">
+  <div class="card" style="width: 18rem;" >
     <img class="card-img-top" src="{{ asset('storage/' . $item->photo) }}" alt="Card image cap">
-    <div class="card-body">
-      <h5 class="card-title">
+    <div class="d-flex flex-column p-3">
+      <h5 class="card-title" style="font-weight: 700;">
         {{ $item->nama }}
       </h5>
-
-      <p class="card-text">
+      <p style="margin-top: 20px;">
         Rp. {{ number_format($item->harga, 0, ',', '.') }}/Hari
       </p>
-      <p class="card-text">
+      <p>
         {{ $item->jumlah_kursi }} Seat
       </p>
-      <p class="card-text">
+      <p>
         Tipe Bus : {{ $item->tipe_bus }}
       </p>
       <a href="{{ route('dashboard.booking.index', ['busid' => $item->id ]) }}" class="btn btn-primary">
-        Booking
+        Sewa
       </a>
     </div>
   </div>

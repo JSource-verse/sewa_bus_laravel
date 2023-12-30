@@ -1,12 +1,22 @@
-@extends('logged.layouts.main')
+@extends('logged.layouts.main',  [
+  'nomor_admin' => $website_info->nomor_admin,
+  'sosial_media' => $website_info->sosial_media
+])
 
 
 @section('content')
+
+@if($website_info->sop)
+<h4>
+  Ketentuan Penyewaan Bus
+</h4>
+<iframe src="{{ asset('storage/' . $website_info->sop) }}" width="100%" height="600px" style="border: none;"></iframe>
+@endif
 <div class="content-header">
   <div class="container-fluid">
     <div class="row mb-2">
       <div class="col-sm-6">
-        <h1 class="m-0">Booking Bus</h1>
+        <h1 class="m-0">Form Sewa Bus</h1>
       </div><!-- /.col -->
     </div><!-- /.row -->
   </div><!-- /.container-fluid -->
@@ -73,6 +83,26 @@
 </div>
 
 @if(Session::get('busAvailable'))
+<h4 style="margin-bottom: 20px;">
+  Daftar Nomor Rekening Perusahaan
+</h4>
+<div class="d-flex flex-wrap" style="gap: 20px;">
+  @foreach($website_info->nomor_rekening as $item)
+    @php
+      list($nama, $nomor_rekening, $nama_bank) = explode(' ', $item, 3);
+    @endphp
+  <div class="card" style="width: 18rem;">
+    <div class="card-body d-flex flex-column">
+      <h5 class="card-title font-weight-bold">
+        {{ $nama_bank }}
+      </h5>
+      <p class="card-text">
+        {{ $nama }} - {{ $nomor_rekening }}
+      </p>
+    </div>
+  </div>
+  @endforeach
+</div>
 <div class="card card-primary">
   <div class="card-header">
     <h3 class="card-title">Form Penyewaan</h3>
@@ -130,27 +160,33 @@
     <!-- /.card-body -->
 
     <div class="card-footer">
-      <a href="#" id="trigger_form_sewa" class="btn btn-primary">Submit</a>
+      <a href="#" id="trigger_form_sewa" class="btn btn-primary">Proses Sewa</a>
     </div>
   </form>
 </div>
 @endif
 
 <script src="{{ asset('lte/plugins/jquery/jquery.min.js')}}"></script>
+
+@if(Session::get('busAvailable') === true)
+<script>
+  $('#jumlah_hari_wrapper').show()
+  $('#checkin').attr('readonly', '')
+  $('#checkout').attr('readonly', '')
+  $('#durasi_sewa').val($('#jumlah_hari').val())
+</script>
+@else
+<script>
+  $('#jumlah_hari_wrapper').hide()
+  $('#btnCheckSchedule').attr('disabled', false)
+</script>
+@endif
+
 <script>
   $(document).ready(function() {
 
     $('#error-message').hide()
 
-    @if(Session::get('busAvailable') === true)
-    $('#jumlah_hari_wrapper').show()
-    $('#checkin').attr('readonly', '')
-    $('#checkout').attr('readonly', '')
-    $('#durasi_sewa').val($('#jumlah_hari').val())
-    @else
-    $('#jumlah_hari_wrapper').hide()
-    $('#btnCheckSchedule').attr('disabled', false)
-    @endif
 
     $('#btnCheckSchedule').attr('disabled', true)
 
@@ -168,11 +204,56 @@
     });
 
 
-    $('#trigger_form_sewa').click(function(e) {
-      e.preventDefault()
+   $('#trigger_form_sewa').click(function (e) {
+    e.preventDefault();
 
-      var form = $('#formSewa')
-      Swal.fire({
+    var form = $('#formSewa');
+
+    var tujuan = $("#tujuan").val();
+    if (tujuan === '') {
+        Swal.fire({
+            title: "Error!",
+            text: "Tujuan Tidak Boleh Kosong",
+            icon: "error",
+        });
+        return; // Hentikan proses lebih lanjut jika validasi gagal
+    }
+
+    // Validasi tujuan_penjemputan
+    var tujuanPenjemputan = $("#penjemputan").val();
+    if (tujuanPenjemputan === '') {
+        Swal.fire({
+            title: "Error!",
+            text: "Penjemputan Tidak Boleh Kosong",
+            icon: "error",
+        });
+        return; // Hentikan proses lebih lanjut jika validasi gagal
+    }
+
+    // Validasi keterangan
+    var keterangan = $("#keterangan").val();
+    if (keterangan.length < 10) {
+        Swal.fire({
+            title: "Error!",
+            text: "Keterangan harus minimal 10 karakter",
+            icon: "error",
+        });
+        return; // Hentikan proses lebih lanjut jika validasi gagal
+    }
+
+    // Validasi bukti_pembayaran
+    var buktiPembayaran = $(".custom-file-input").val();
+    if (!buktiPembayaran) {
+        Swal.fire({
+            title: "Error!",
+            text: "Pilih file bukti pembayaran",
+            icon: "error",
+        });
+        return; // Hentikan proses lebih lanjut jika validasi gagal
+    }
+
+    // Jika semua validasi berhasil, tampilkan konfirmasi SweetAlert
+    Swal.fire({
         title: "Data Yang Dimasukan Sudah Benar?",
         text: "Kamu Tidak Bisa Merubah Data Jika Sudah Submit Form",
         icon: "warning",
@@ -181,12 +262,13 @@
         cancelButtonColor: "#d33",
         cancelButtonText: "Batalkan",
         confirmButtonText: "Sudah Benar"
-      }).then((result) => {
+    }).then((result) => {
         if (result.isConfirmed) {
-          form.submit();
+            form.submit();
         }
-      });
-    })
+    });
+});
+
 
 
   });
@@ -212,12 +294,12 @@
 
     // Validasi tanggal di sisi klien
     if (checkinDate === "" || checkoutDate === "") {
-      $("#error-message").text("Both checkin and checkout dates are required.");
+      $("#error-message").text("Tanggal check-in dan check-out wajib diisi.");
       $('#btnCheckSchedule').attr('disabled', true)
     } else if (new Date(checkinDate) >= new Date(checkoutDate)) {
-      $("#error-message").text("Checkout date must be greater than checkin date.");
+      $("#error-message").text("Tanggal check-out harus lebih besar dari tanggal check-in.");
     } else if (new Date(checkinDate) <= new Date().setHours(0, 0, 0, 0)) {
-      $("#error-message").text("Checkin date must be greater than today.");
+      $("#error-message").text("Tanggal check-in harus lebih lama dari hari ini.");
     } else {
       $("#error-message").text("");
       $('#error-message').hide()
@@ -237,24 +319,26 @@
   }
 </script>
 
+@if(Session::has('busAvailable'))
+@if(Session::get('busAvailable') === false)
 <script type="text/javascript">
-  @if(Session::has('busAvailable'))
-  @if(Session::get('busAvailable') === false)
   Swal.fire({
-    title: "Upps..",
+    title: "Gagal",
     text: "Sudah Ada yang Booking Di tanggal tersebut",
     icon: "error",
     type: "error",
   });
-  @else
+</script>
+@else
+<script>
   Swal.fire({
-    title: "Success",
+    title: "Sukses",
     text: "Bus Yang Kamu Pilih Tersedia di tanggal tersebut",
     icon: "success",
     type: "success",
   });
-  @endif
-  @endif
 </script>
+@endif
+@endif
 
 @endsection

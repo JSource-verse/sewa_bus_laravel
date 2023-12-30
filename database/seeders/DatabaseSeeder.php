@@ -5,6 +5,7 @@ namespace Database\Seeders;
 // use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 
 use App\Models\Bus;
+use App\Models\Website;
 use Illuminate\Database\Seeder;
 
 class DatabaseSeeder extends Seeder
@@ -28,6 +29,12 @@ class DatabaseSeeder extends Seeder
             'email' => 'user@gmail.com',
             'password' => bcrypt('12345678'),
             'role' => 'user'
+        ]);
+
+        Website::create([
+            'nomor_admin' => ['08123123123', '081231232'],
+            'nomor_rekening' => ['Sigit 33201231231823 BRI', 'Wahyu 91231231762 BCA'],
+            'sosial_media' => ['instagram @wahyupanambang']
         ]);
 
         Bus::factory()->count(20)->create();

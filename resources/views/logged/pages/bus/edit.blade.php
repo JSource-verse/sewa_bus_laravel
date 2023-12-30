@@ -1,4 +1,7 @@
-@extends('logged.layouts.main')
+@extends('logged.layouts.main',  [
+  'nomor_admin' => $website_info->nomor_admin,
+  'sosial_media' => $website_info->sosial_media
+])
 
 
 @section('content')
@@ -60,7 +63,7 @@
     <!-- /.card-body -->
 
     <div class="card-footer">
-      <button type="submit" class="btn btn-primary">Submit</button>
+      <button type="submit" class="btn btn-primary">Proses Edit Bus</button>
     </div>
   </form>
 </div>

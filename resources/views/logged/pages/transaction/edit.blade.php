@@ -1,4 +1,7 @@
-@extends('logged.layouts.main')
+@extends('logged.layouts.main',  [
+  'nomor_admin' => $website_info->nomor_admin,
+  'sosial_media' => $website_info->sosial_media
+])
 
 @section('content')
 <div class="container-fluid">
@@ -13,21 +16,21 @@
 </div><!-- /.container-fluid -->
 </div>
 
-<form action="{{ route('dashboard.admin.transaction.update', ['id' => $data->id]) }}" method="POST">
+<form action="{{ route('dashboard.admin.transaction.update', ['id' => $data->id]) }}" method="POST" style="margin-bottom: 30px;">
   @method('POST')
   @csrf
   <div class="row px-5">
-    <div class="col-md-6">
-      <div class="row">
-        <div class="col-md-6">
+    <div class="col-md-12 col-lg-6">
+      <div class="row" style="margin-bottom: 22px;">
+        <div class="col-sm-6 ">
           <div class="d-flex flex-column">
             <label for="Nama Penyewa">
               Foto KTP
             </label>
-            <input type="text" readonly class="form-control" value="{{ $data->user->name }}" id="Nama Penyewa">
+            <img src="{{ asset('storage/' . $data->user->ktp_image) }}" width="200" alt="">
           </div>
         </div>
-        <div class="col-md-6">
+        <div class="col-sm-6 ">
           <div class="d-flex flex-column">
             <label for="Bukti Pembayaran">
               Bukti Transfer
@@ -41,6 +44,12 @@
           Nama Penyewa
         </label>
         <input type="text" readonly class="form-control" value="{{ $data->user->name }}" id="Nama Penyewa">
+      </div>
+      <div class="form-group">
+        <label for="Nomor Whatsapp">
+          Nomor Whatsapp
+        </label>
+        <input type="text" readonly class="form-control" value="{{ $data->user->no_hp }}" id="Nomor Whatsapp">
       </div>
       <div class="row">
         <div class="col-md-4">
@@ -87,12 +96,9 @@
             <input type="text" readonly class="form-control" value="{{ $data->penjemputan }}" id="penjemputan">
           </div>
         </div>
-        <button class="btn btn-warning" type="submit">
-          Proses Edit Status
-        </button>
       </div>
     </div>
-    <div class="col-md-6">
+    <div class="col-md-12 col-lg-6">
       <div class="form-group">
         <label for="penjemputan">
           Nama Bus
@@ -133,6 +139,14 @@
         </label>
         <textarea type="text" readonly class="form-control" id="keterangan">{{ $data->keterangan }}</textarea>
       </div>
+      @if($data->alasan)
+      <div class="form-group">
+        <label for="keterangan">
+          Alasan Pembatalan
+        </label>
+        <textarea type="text" readonly class="form-control" id="alasan">{{ $data->alasan }}</textarea>
+      </div>
+      @endif
       <div class="form-group">
         <label for="keterangan">
           Status
@@ -147,6 +161,18 @@
           <option value="menunggu persetujuan">
             Menunggu Persetujuan
           </option>
+          <option value="sudah disetujui">
+            Sudah Disetujui
+          </option>
+          <option value="permintaan batal tidak disetujui">
+            Permintaan Batal Tidak Disetujui
+          </option>
+          <option value="permintaan batal disetujui">
+            Permintaan Batal Disetujui
+          </option>
+          <option value="selesai">
+            Selesai
+          </option>
         </select>
       </div>
       <div class="form-group">
@@ -159,6 +185,10 @@
 
     </div>
   </div>
+
+   <button class="btn btn-warning font-weight-bold" type="submit" style="margin-left: 50px;">
+          Proses Edit Status
+  </button>
 
 </form>
 

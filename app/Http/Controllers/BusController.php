@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Bus;
+use App\Models\Website;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 
@@ -13,8 +14,9 @@ class BusController extends Controller
      */
     public function index()
     {
+         $website_info = Website::find(1);
         $data = Bus::orderBy('created_at', 'desc')->get();
-        return view('logged.pages.bus.index', compact('data'));
+        return view('logged.pages.bus.index', compact('data', 'website_info'));
     }
 
     /**
@@ -56,8 +58,9 @@ class BusController extends Controller
      */
     public function show(Bus $bus, $id)
     {
+         $website_info = Website::find(1);
         $bus = Bus::findOrFail($id);
-        return view('logged.pages.bus.edit', compact('bus'));
+        return view('logged.pages.bus.edit', compact('bus', 'website_info'));
     }
 
     /**
@@ -66,9 +69,8 @@ class BusController extends Controller
      */
     public function edit(Bus $Bus)
     {
-
-        
-        return view('logged.pages.bus.create');
+        $website_info = Website::find(1);
+        return view('logged.pages.bus.create', compact('website_info'));
     }
 
     /**

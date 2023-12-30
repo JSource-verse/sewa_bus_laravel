@@ -21,8 +21,10 @@ return new class extends Migration {
             $table->string('penjemputan');
             $table->string('bukti_pembayaran');
             $table->text('keterangan');
-            $table->enum('status', ['menunggu persetujuan', 'sudah disetujui'])->default('menunggu persetujuan');
+            $table->enum('status', ['menunggu persetujuan', 'sudah disetujui', 'permintaan batal', 'permintaan batal tidak disetujui', 'permintaan batal disetujui', 'selesai'])->default('menunggu persetujuan');
             $table->string('total');
+            $table->boolean('is_cancel')->default(false);
+            $table->string('alasan')->nullable();
             $table->timestamps();
 
             $table->foreign('bus_id')->on('buses')->references('id')->onDelete('cascade');

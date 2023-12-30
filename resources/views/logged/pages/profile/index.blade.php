@@ -1,4 +1,7 @@
-@extends('logged.layouts.main')
+@extends('logged.layouts.main',  [
+  'nomor_admin' => $website_info->nomor_admin,
+  'sosial_media' => $website_info->sosial_media
+])
 
 
 @section('content')
@@ -24,13 +27,18 @@
     <div class="card-body">
       <div class="form-group">
         <label for="name">Name</label>
-        <input type="text" name="name" class="form-control" value="{{ $user->name }}" id="name"
-          placeholder="Enter Name">
+        <input type="text" name="name" class="form-control" value="{{ $user->name }}" id="name" placeholder="Enter Name"
+          required>
       </div>
       <div class="form-group">
         <label for="email">Email address</label>
         <input type="email" name="email" class="form-control" value="{{ $user->email }}" id="email"
-          placeholder="Enter email">
+          placeholder="Enter email" required>
+      </div>
+      <div class="form-group">
+        <label for="no_hp">Nomor Whatsappp</label>
+        <input type="no_hp" name="no_hp" class="form-control" value="{{ $user->no_hp }}" id="no_hp" placeholder="No Hp"
+          required>
       </div>
       <div class="form-group d-flex flex-column">
         <label for="ktp">KTP</label>
@@ -65,22 +73,6 @@
       readURL(this);
     });
 
-    @if(Session::get('updateSuccess'))
-    Swal.fire({
-      title: "Success",
-      text: "Update Profile Berhasil",
-      icon: "success"
-    });
-    @endif
-
-    @if(Session::has('error'))
-    Swal.fire({
-      title: "Erorr!",
-      text: "Data Kamu Belum Lengkap! Upload KTP dahulu sebelum melakukan pemesanan bus",
-      icon: "error"
-    });
-    @endif
-
   })
 
   function readURL(input) {
@@ -98,4 +90,24 @@
     }
   }
 </script>
+
+@if(Session::has('error'))
+<script>
+  Swal.fire({
+    title: "Erorr!",
+    text: "Data Kamu Belum Lengkap! Upload KTP dahulu sebelum melakukan pemesanan bus",
+    icon: "error"
+  });
+</script>
+@endif
+
+@if(Session::get('updateSuccess'))
+<script>
+  Swal.fire({
+    title: "Success",
+    text: "Update Profile Berhasil",
+    icon: "success"
+  });
+</script>
+@endif
 @endsection

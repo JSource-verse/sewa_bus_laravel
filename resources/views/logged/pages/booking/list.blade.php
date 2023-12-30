@@ -1,4 +1,7 @@
-@extends('logged.layouts.main')
+@extends('logged.layouts.main',  [
+  'nomor_admin' => $website_info->nomor_admin,
+  'sosial_media' => $website_info->sosial_media
+])
 
 @section('content')
 <div class="content-header">
@@ -39,6 +42,7 @@
           <th>Status</th>
 
           <th>Bukti Pembayaran</th>
+          <th>Action</th>
         </tr>
       </thead>
       <tbody>
@@ -73,25 +77,35 @@
             {{ $item->keterangan }}
           </td>
           <td>
-            {{ $item->durasi_sewa }}
+            {{ $item->durasi_sewa }} hari
           </td>
           <td>
             {{ 'Rp. ' . number_format($item->total , 0,0)}}
           </td>
           <td>
-            <div class="badge {{ $item->status === 'menunggu persetujuan' ? 'badge-info' : 'badge-success' }}">
-             {{ strtoupper($item->status) }}
-           </div>
+            <div class="badge @if($item->status === 'menunggu persetujuan')
+                  badge-info
+              @elseif($item->status === 'sudah disetujui')
+                  badge-success
+              @else
+                  badge-danger
+              @endif
+          ">
+              {{ strtoupper($item->status) }}
+            </div>
           </td>
-
-
           <td>
             <img src=" {{ url('/') . '/storage/' . ($item->bukti_pembayaran) }}" class="img-responsive"
               style="width: 200px;" alt="">
           </td>
+          <td>
+            <button type="button" class="btn btn-danger trigger_request_cancel" {{ $item->is_cancel === 0 || now() >= $item->tanggal_checkout ? '' : 'disabled' }}
+              data-id="{{ $item->id }}">
+             Batalkan Sewa
+            </button>
+          </td>
         </tr>
         @endforeach
-
       </tbody>
     </table>
   </div>
@@ -106,17 +120,69 @@
       "lengthChange": false,
       "autoWidth": false,
     }).buttons().container().appendTo('#example1_wrapper .col-md-6:eq(0)');
-  });
 
-  @if(Session::get('successCreate'))
+
+    $('.trigger_request_cancel').click(function() {
+      const id = $(this).data('id');
+
+      Swal.fire({
+        title: "Alert",
+        text: "Anda Ingin Membatalkan Transaksi ?",
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonColor: "#3085d6",
+        cancelButtonColor: "#d33",
+        cancelButtonText: "Batalkan",
+        confirmButtonText: "Ya, Lanjutkan",
+        html: `<form id="form_cancel" method="POST" action="/booking/cancel/${id}">
+        @csrf
+       <div class="form-group">
+        <label for="alasan">Alasan Pembatalan</label>
+        <textarea type="text" class="form-control" id='alasan' name="alasan"
+          placeholder="Tuliskan Alasan Pembatalan Mu Disini" required></textarea>
+      </div>
+        </form>`
+      }).then((result) => {
+        const alasan = $('#alasan').val()
+
+        if (result.isConfirmed) {
+          if (alasan === '') {
+            Swal.fire({
+              title: "Error",
+              text: "Alasan Pembatalan Harus Diisi",
+              icon: "error",
+              type: "error",
+            });
+
+            return
+          }
+          $('#form_cancel').submit();
+        }
+      });
+    })
+  });
+</script>
+
+@if(Session::get('successCreate'))
+<script>
   Swal.fire({
     title: "Success",
     text: "Transaksi Berhasil Dibuat. Tunggu Admin Mengkonfirmasi Transaksi Anda",
     icon: "success",
     type: "success",
   });
-  @endif
-
 </script>
+@endif
+
+@if(Session::get('successCancel'))
+<script>
+  Swal.fire({
+    title: "Success",
+    text: "Permintaan Batal Transaksi Berhasil Tunggu Admin Menghubungi Anda",
+    icon: "success",
+    type: "success",
+  });
+</script>
+@endif
 
 @endsection

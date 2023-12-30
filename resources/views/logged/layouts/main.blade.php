@@ -11,7 +11,7 @@
   <script src="
 https://cdn.jsdelivr.net/npm/sweetalert2@11.10.0/dist/sweetalert2.all.min.js
 "></script>
-
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.min.js" integrity="sha512-L0Shl7nXXzIlBSUUPpxrokqq4ojqgZFQczTYlGjzONGTDAcLremjwaWv5A+EDLnxhQzY5xUZPWLOLqYRkY0Cbw==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 
   <!-- Google Font: Source Sans Pro -->
   <link rel="stylesheet"
@@ -69,34 +69,20 @@ https://cdn.jsdelivr.net/npm/sweetalert2@11.10.0/dist/sweetalert2.all.min.js
       <a href="index3.html" class="brand-link">
         <img src="{{asset('lte/dist/img/AdminLTELogo.png')}}" alt="AdminLTE Logo"
           class="brand-image img-circle elevation-3" style="opacity: .8">
-        <span class="brand-text font-weight-light"> 3</span>
+        <span class="brand-text font-weight-light">PO. Lestari Alam Raya </span>
       </a>
 
       <!-- Sidebar -->
       <div class="sidebar">
         <!-- Sidebar user panel (optional) -->
         <div class="user-panel mt-3 pb-3 mb-3 d-flex">
-          <div class="image">
-            <img src="{{asset('lte/dist/img/user2-160x160.jpg')}}" class="img-circle elevation-2" alt="User Image">
-          </div>
           <div class="info">
             <a href="#" class="d-block">
-              {{ Auth::user()->name }}
+              Login as : {{ Auth::user()->name }}
             </a>
           </div>
         </div>
 
-        <!-- SidebarSearch Form -->
-        <div class="form-inline">
-          <div class="input-group" data-widget="sidebar-search">
-            <input class="form-control form-control-sidebar" type="search" placeholder="Search" aria-label="Search">
-            <div class="input-group-append">
-              <button class="btn btn-sidebar">
-                <i class="fas fa-search fa-fw"></i>
-              </button>
-            </div>
-          </div>
-        </div>
 
         <!-- Sidebar Menu -->
         <nav class="mt-2">
@@ -125,7 +111,23 @@ https://cdn.jsdelivr.net/npm/sweetalert2@11.10.0/dist/sweetalert2.all.min.js
               <a href="{{ route('dashboard.admin.transaction') }}" class="nav-link">
                 <i class="nav-icon fas fa-th"></i>
                 <p>
-                  Transaksi
+                  Transaksi Menunggu Konfirmasi
+                </p>
+              </a>
+            </li>
+            <li class="nav-item">
+              <a href="{{ route('dashboard.admin.transaction.cancel') }}" class="nav-link">
+                <i class="nav-icon fas fa-th"></i>
+                <p>
+                  Permintaan Batal / Transaksi Yang Batal
+                </p>
+              </a>
+            </li>
+            <li class="nav-item">
+              <a href="{{ route('dashboard.admin.pengaturan') }}" class="nav-link">
+                <i class="nav-icon fas fa-th"></i>
+                <p>
+                  Pengaturan Website
                 </p>
               </a>
             </li>
@@ -134,11 +136,11 @@ https://cdn.jsdelivr.net/npm/sweetalert2@11.10.0/dist/sweetalert2.all.min.js
               <a href="{{ route('dashboard.booking.history') }}" class="nav-link">
                 <i class="nav-icon fas fa-th"></i>
                 <p>
-                  History Sewa
+                  Riwayat Penyewaan
                 </p>
               </a>
             </li>
-             <li class="nav-item">
+            <li class="nav-item">
               <a href="/profile" class="nav-link">
                 <i class="nav-icon fas fa-th"></i>
                 <p>
@@ -176,14 +178,30 @@ https://cdn.jsdelivr.net/npm/sweetalert2@11.10.0/dist/sweetalert2.all.min.js
       <!-- /.content -->
     </div>
     <!-- /.content-wrapper -->
-    <footer class="main-footer">
-      <strong>Copyright &copy; 2014-2021 <a href="https://adminlte.io">AdminLTE.io</a>.</strong>
-      All rights reserved.
-      <div class="float-right d-none d-sm-inline-block">
-        <b>Version</b> 3.2.0
-      </div>
+     <footer class="main-footer">
+    <div class="d-flex" style="gap: 20px;">
+       <div class="">
+        <h5>Kontak Kami</h5>
+        <div class="d-flex flex-wrap" style="gap: 20px; max-width: 400px;">
+          @foreach($nomor_admin as $item)
+        <p>
+          {{ $item }}
+        </p>
+        @endforeach
+        </div>
+     </div>
+     <div class="">
+        <h5>Sosial Media</h5>
+        <div class="d-flex flex-wrap" style="gap: 20px; max-width: 400px;">
+          @foreach($sosial_media as $item)
+        <p>
+          {{ $item }}
+        </p>
+        @endforeach
+        </div>
+     </div>
+    </div>
     </footer>
-
     <!-- Control Sidebar -->
     <aside class="control-sidebar control-sidebar-dark">
       <!-- Control sidebar content goes here -->

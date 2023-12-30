@@ -7,6 +7,7 @@ use App\Http\Requests\StoreTransactionRequest;
 use App\Http\Requests\UpdateTransactionRequest;
 use App\Models\Bus;
 use App\Models\User;
+use App\Models\Website;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
@@ -23,29 +24,32 @@ class TransactionController extends Controller
         $userId = Auth::user()->id;
         $bus = Bus::find($busId);
         $user = User::find($userId);
+        $website_info = Website::find(1);
 
-        if($user->ktp_image === null) {
+
+        if($user->ktp_image === null || $user->no_hp === null) {
             return redirect('/profile')->with('error', 'Silahkan Lengkapi KTP Sebelum Melakukan Pemesanan');
         }
 
-        return view('logged.pages.booking.index', compact('bus', 'user'));
+        return view('logged.pages.booking.index', compact('bus', 'user', 'website_info'));
     }
 
 
     public function CheckBusSchedule(Request $request)
     {
 
-       $isAvailable = Transaction::where('bus_id', $request->bus_id)
-    ->where(function ($query) use ($request) {
-        $query->whereBetween('tanggal_checkin', [$request->checkin, $request->checkout])
-            ->orWhereBetween('tanggal_checkout', [$request->checkin, $request->checkout]);
-    })
-    ->get();
+        $isAvailable = Transaction::where('bus_id', $request->bus_id)
+            ->where('status', '!=', ['permintaan batal disetujui', 'selesai'])
+            ->where(function ($query) use ($request) {
+                $query->whereBetween('tanggal_checkin', [$request->checkin, $request->checkout])
+                    ->orWhereBetween('tanggal_checkout', [$request->checkin, $request->checkout]);
+            })->get();
 
 
         $bus = Bus::find($request->bus_id);
 
         $harga = $bus->harga * $request->jumlah_hari;
+
 
 
 
@@ -101,14 +105,15 @@ class TransactionController extends Controller
     public function show(Transaction $transaction)
     {
 
+         $website_info = Website::find(1);
 
         if(Auth::user()->role === 'admin') {
-            $data = Transaction::all();
-            return view('logged.pages.transaction.index', compact('data'));
+            $data = Transaction::where('status', '!=', 'batal')->where('status', '!=', 'permintaan batal')->get();
+            return view('logged.pages.transaction.index', compact('data', 'website_info'));
         }
 
         $data = Transaction::where('user_id', Auth::user()->id)->orderBy('created_at', 'desc')->get();
-        return view('logged.pages.booking.list', compact('data'));
+        return view('logged.pages.booking.list', compact('data', 'website_info'));
     }
 
     /**
@@ -116,8 +121,9 @@ class TransactionController extends Controller
      */
     public function edit(Transaction $transaction, $id)
     {
+         $website_info = Website::find(1);
         $data = Transaction::find($id);
-        return view('logged.pages.transaction.edit', compact('data'));
+        return view('logged.pages.transaction.edit', compact('data', 'website_info'));
     }
 
     /**
@@ -125,9 +131,20 @@ class TransactionController extends Controller
      */
     public function update(Request $request, $id)
     {
+
         $validData = $request->validate([
             'status' => 'required|string'
         ]);
+
+         if($request->status === 'batal'){
+             Transaction::where('id', $id)->update([
+                'status' => $request->status,
+                'is_cancel' => 1
+             ]);
+            return redirect('/admin/transaksi')->with('successUpdate', true);
+        }
+
+        
         
         Transaction::where('id', $id)->update($validData);
         return redirect('/admin/transaksi')->with('successUpdate', true);
@@ -151,4 +168,24 @@ class TransactionController extends Controller
 
         return redirect('admin/transaksi')->with('successDelete', true);
     }
+
+    public function cancel(Request $request, $id)
+    {
+        Transaction::where('id', $id)->update([
+            'is_cancel' => 1,
+            'alasan' => $request->alasan,
+            'status' => 'permintaan batal'
+        ]);
+
+        return redirect()->back()->with('successCancel', true);
+    }
+
+    public function show_cancel()
+    {
+         $website_info = Website::find(1);
+        $data = Transaction::where('is_cancel', 1)->orderBy('created_at', 'desc')->get();
+
+        return view('logged.pages.transaction.cancel', compact('data', 'website_info'));
+    }
+
 }
