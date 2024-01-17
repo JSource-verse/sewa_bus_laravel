@@ -1,6 +1,6 @@
-@extends('logged.layouts.main',  [
-  'nomor_admin' => $website_info->nomor_admin,
-  'sosial_media' => $website_info->sosial_media
+@extends('logged.layouts.main', [
+'nomor_admin' => $website_info->nomor_admin,
+'sosial_media' => $website_info->sosial_media
 ])
 
 @section('content')
@@ -23,6 +23,7 @@
       <thead>
         <tr>
           <th>No</th>
+          <th>id</th>
           <th>Nama Bus</th>
           <th>Tipe</th>
           <th>
@@ -50,6 +51,9 @@
         <tr>
           <td>
             {{ $key + 1 }}
+          </td>
+          <td>
+            {{ $item->id }}
           </td>
           <td>
             {{ $item->bus->nama }}
@@ -99,9 +103,10 @@
               style="width: 200px;" alt="">
           </td>
           <td>
-            <button type="button" class="btn btn-danger trigger_request_cancel" {{ $item->is_cancel === 0 || now() >= $item->tanggal_checkout ? '' : 'disabled' }}
+            <button type="button" class="btn btn-danger trigger_request_cancel" {{ $item->is_cancel === 0 || now() >=
+              $item->tanggal_checkout ? '' : 'disabled' }}
               data-id="{{ $item->id }}">
-             Batalkan Sewa
+              Batalkan Sewa
             </button>
           </td>
         </tr>
@@ -114,15 +119,59 @@
 
 <script src="{{ asset('lte/plugins/jquery/jquery.min.js')}}"></script>
 <script>
-  $(function() {
-    $("#example1").DataTable({
-      "responsive": true,
-      "lengthChange": false,
-      "autoWidth": false,
-    }).buttons().container().appendTo('#example1_wrapper .col-md-6:eq(0)');
+  $(document).ready(function() {
+    var table = $('#example1').DataTable({
+      responsive: {
+        autoWidth: true,
+        details: {
+          display: DataTable.Responsive.display.modal({
+            header: function(row) {
+              var data = row.data();
+              return 'Detail Sewa Bus ' + data[2];
+            }
+          }),
+          renderer: DataTable.Responsive.renderer.tableAll()
+        }
+      },
+      columnDefs: [{
+        targets: -1, // Target the last column
+        data: null, // Use the entire row data
+        render: function(data, type, row) {
+          // Use the row data to create the content of the "Actions" column
+          var id = row[1]
+          var isCancel = row[12].toLowerCase().includes('permintaan batal');
+          var tanggalCheckout = row[6];
+          let date = new Date();
+          let year = new Intl.DateTimeFormat('en', {
+            year: 'numeric'
+          }).format(date);
+          let month = new Intl.DateTimeFormat('en', {
+            month: '2-digit'
+          }).format(date);
+          let day = new Intl.DateTimeFormat('en', {
+            day: '2-digit'
+          }).format(date);
+          var dateNow = `${year}-${month}-${day}`;
+
+          console.log(tanggalCheckout === dateNow);
 
 
-    $('.trigger_request_cancel').click(function() {
+
+
+          return `<button type="button" class="btn btn-danger trigger_request_cancel"
+        ${isCancel || new Date() >= new Date(tanggalCheckout) ? 'disabled' : '' }
+        data-id="${id}">
+    Batalkan Sewa
+</button>
+`;
+        }
+      }]
+    })
+
+    table.column(1).visible(false)
+
+
+    $(document).on('click', '.trigger_request_cancel', function(e) {
       const id = $(this).data('id');
 
       Swal.fire({
@@ -160,7 +209,8 @@
         }
       });
     })
-  });
+
+  })
 </script>
 
 @if(Session::get('successCreate'))

@@ -54,18 +54,19 @@ Route::middleware([
             ->select('transactions.bus_id', 'buses.nama as nama_bus', DB::raw('COUNT(*) as total_sewa'))
             ->orderBy('total_sewa', 'desc')
             ->get();
+
             
 
         return view('logged.pages.index', compact('transactions', 'pendingTransactions', 'users', 'cancelTransaction', 'popularBuses', 'website_info'));
     })->name('dashboard');
 
-    Route::get('/get-chart-data', function(Request $request){
+    Route::get('/get-chart-data', function (Request $request) {
 
 
         $totalTransactionInMonth = [];
         $totalCancelTransactionInMonth = [];
        
-        for ($i=1; $i <= 12; $i++) { 
+        for ($i=1; $i <= 12; $i++) {
             $totalTransaction = Transaction::where('status', 'selesai')
                 ->whereMonth('created_at', $i)
                 ->whereYear('created_at', intval($request->tahun))
@@ -73,10 +74,10 @@ Route::middleware([
 
             $totalTransactionInMonth[] = $totalTransaction;
 
-             $totalCancelTransaction = Transaction::where('status', 'permintaan batal disetujui')
-                ->whereMonth('created_at', $i)
-                ->whereYear('created_at', intval($request->tahun))
-                ->count();
+            $totalCancelTransaction = Transaction::where('status', 'permintaan batal disetujui')
+               ->whereMonth('created_at', $i)
+               ->whereYear('created_at', intval($request->tahun))
+               ->count();
 
             $totalCancelTransactionInMonth[] = $totalCancelTransaction;
         }

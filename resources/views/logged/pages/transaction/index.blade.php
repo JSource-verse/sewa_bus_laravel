@@ -1,6 +1,6 @@
-@extends('logged.layouts.main',  [
-  'nomor_admin' => $website_info->nomor_admin,
-  'sosial_media' => $website_info->sosial_media
+@extends('logged.layouts.main', [
+'nomor_admin' => $website_info->nomor_admin,
+'sosial_media' => $website_info->sosial_media
 ])
 
 @section('content')
@@ -23,6 +23,7 @@
       <thead>
         <tr>
           <th>No</th>
+          <th>id</th>
           <th>Nama Penyewa</th>
           <th>Nama Bus</th>
           <th>Tipe</th>
@@ -52,6 +53,9 @@
             {{ $key + 1 }}
           </td>
           <td>
+            {{ $item->id }}
+          </td>
+          <td>
             {{ $item->user->name }}
           </td>
           <td>
@@ -74,7 +78,6 @@
           </td>
           <td>
             {{ $item->penjemputan }}
-
           </td>
           <td>
             {{ $item->keterangan }}
@@ -103,9 +106,9 @@
                 id="form_delete_transaction">
                 @method('POST')
                 @csrf
-                <button type="button" class="btn btn-danger trigger_button_delete">
+                <div class="btn btn-danger trigger_button_delete" id="trigger">
                   Delete
-                </button>
+                </div>
               </form>
             </div>
           </td>
@@ -118,23 +121,50 @@
   <!-- /.card-body -->
 </div>
 
-<script src="{{ asset('lte/plugins/jquery/jquery.min.js')}}"></script>
-<script>
-  $(function() {
-    $("#example1").DataTable({
-      "responsive": true,
-      "lengthChange": false,
-      "autoWidth": false,
-    }).buttons().container().appendTo('#example1_wrapper .col-md-6:eq(0)');
-  });
-</script>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.datatables.net/1.10.24/js/jquery.dataTables.min.js"></script>
+<script src="https://cdn.datatables.net/responsive/2.2.7/js/dataTables.responsive.min.js"></script>
+<!-- Other scripts -->
 
 <script>
   $(document).ready(function() {
-    $('.trigger_button_delete').click(function(e) {
-      e.preventDefault()
+    var table = $('#example1').DataTable({
+      responsive: {
+        autoWidth: true,
+        details: {
+          display: DataTable.Responsive.display.modal({
+            header: function(row) {
+              var data = row.data();
+              return 'Details for ' + data[2];
+            }
+          }),
+          renderer: DataTable.Responsive.renderer.tableAll()
+        }
+      },
+      columnDefs: [{
+        targets: -1, // Target the last column
+        data: null, // Use the entire row data
+        render: function(data, type, row) {
+          // Use the row data to create the content of the "Actions" column
+          var id = row[1]
+          return `<div style="display: flex; gap: 20px;">
+           <a href="/admin/transaksi/edit/${id}"
+          class="btn btn-warning" >Edit</a> 
+          <form action="/admin/transaksi/delete/${id}"
+          method="POST" id="form_delete_transaction">
+            @method('POST')
+            @csrf
+            <div class = "btn btn-danger trigger_button_delete" rowId="${id}" id="trigger" >
+            Delete </div> </form></div>`;
+        }
+      }]
+    })
 
-      var form = $(this).closest('form#form_delete_transaction');
+    table.column(1).visible(false)
+
+
+    $(document).on('click', '.trigger_button_delete', function(e) {
+      e.preventDefault()
       Swal.fire({
         title: "Anda Yakin ?",
         text: "Kamu Tidak Bisa Mengembalikan data yang terhapus !",
@@ -145,13 +175,17 @@
         confirmButtonText: "Ya, Hapus",
         cancelButtonText: 'Batalkan'
       }).then((result) => {
+
+
+        var form = $(this).closest('form#form_delete_transaction');
         if (result.isConfirmed) {
           form.submit();
         }
       });
-    })
+    });
 
-  })
+
+  });
 </script>
 
 @if(Session::has('successDelete'))

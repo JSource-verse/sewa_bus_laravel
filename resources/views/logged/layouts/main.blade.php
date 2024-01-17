@@ -11,7 +11,9 @@
   <script src="
 https://cdn.jsdelivr.net/npm/sweetalert2@11.10.0/dist/sweetalert2.all.min.js
 "></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.min.js" integrity="sha512-L0Shl7nXXzIlBSUUPpxrokqq4ojqgZFQczTYlGjzONGTDAcLremjwaWv5A+EDLnxhQzY5xUZPWLOLqYRkY0Cbw==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.min.js"
+    integrity="sha512-L0Shl7nXXzIlBSUUPpxrokqq4ojqgZFQczTYlGjzONGTDAcLremjwaWv5A+EDLnxhQzY5xUZPWLOLqYRkY0Cbw=="
+    crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 
   <!-- Google Font: Source Sans Pro -->
   <link rel="stylesheet"
@@ -45,10 +47,10 @@ https://cdn.jsdelivr.net/npm/sweetalert2@11.10.0/dist/sweetalert2.all.min.js
   <div class="wrapper">
 
     <!-- Preloader -->
-    <div class="preloader flex-column justify-content-center align-items-center">
+    <!-- <div class="preloader flex-column justify-content-center align-items-center">
       <img class="animation__shake" src="{{asset('lte/dist/img/AdminLTELogo.png')}}" alt="AdminLTELogo" height="60"
         width="60">
-    </div>
+    </div> -->
 
     <!-- Navbar -->
     <nav class="main-header navbar navbar-expand navbar-white navbar-light">
@@ -178,29 +180,29 @@ https://cdn.jsdelivr.net/npm/sweetalert2@11.10.0/dist/sweetalert2.all.min.js
       <!-- /.content -->
     </div>
     <!-- /.content-wrapper -->
-     <footer class="main-footer">
-    <div class="d-flex" style="gap: 20px;">
-       <div class="">
-        <h5>Kontak Kami</h5>
-        <div class="d-flex flex-wrap" style="gap: 20px; max-width: 400px;">
-          @foreach($nomor_admin as $item)
-        <p>
-          {{ $item }}
-        </p>
-        @endforeach
+    <footer class="main-footer">
+      <div class="d-flex" style="gap: 20px;">
+        <div class="">
+          <h5>Kontak Kami</h5>
+          <div class="d-flex flex-wrap" style="gap: 20px; max-width: 400px;">
+            @foreach($nomor_admin as $item)
+            <p>
+              {{ $item }}
+            </p>
+            @endforeach
+          </div>
         </div>
-     </div>
-     <div class="">
-        <h5>Sosial Media</h5>
-        <div class="d-flex flex-wrap" style="gap: 20px; max-width: 400px;">
-          @foreach($sosial_media as $item)
-        <p>
-          {{ $item }}
-        </p>
-        @endforeach
+        <div class="">
+          <h5>Sosial Media</h5>
+          <div class="d-flex flex-wrap" style="gap: 20px; max-width: 400px;">
+            @foreach($sosial_media as $item)
+            <p>
+              {{ $item }}
+            </p>
+            @endforeach
+          </div>
         </div>
-     </div>
-    </div>
+      </div>
     </footer>
     <!-- Control Sidebar -->
     <aside class="control-sidebar control-sidebar-dark">

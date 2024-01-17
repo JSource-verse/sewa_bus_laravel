@@ -1,6 +1,6 @@
-@extends('logged.layouts.main',  [
-  'nomor_admin' => $website_info->nomor_admin,
-  'sosial_media' => $website_info->sosial_media
+@extends('logged.layouts.main', [
+'nomor_admin' => $website_info->nomor_admin,
+'sosial_media' => $website_info->sosial_media
 ])
 
 
@@ -27,6 +27,7 @@
       <thead>
         <tr>
           <th>No</th>
+          <th>id</th>
           <th>Nama</th>
           <th>Tipe</th>
           <th>Jumlah Kursi</th>
@@ -40,6 +41,9 @@
         <tr>
           <td>
             {{ $key + 1 }}
+          </td>
+          <td>
+            {{ $item->id }}
           </td>
           <td>
             {{ $item->nama }}
@@ -60,15 +64,16 @@
           <td>
             <div class="d-flex">
               <a href="{{ route('dashboard.bus.edit', ['id' => $item->id ])}}" class="btn btn-warning">
-              Edit
-            </a>
-            <form action="{{ route('dashboard.bus.delete', ['id' => $item->id ]) }}" class="delete-form" method="POST">
-              @method('DELETE')
-              @csrf
-              <a href="#" class="btn btn-danger ml-3 trigger_button_delete">
-                Delete
+                Edit
               </a>
-            </form>
+              <form action="{{ route('dashboard.bus.delete', ['id' => $item->id ]) }}" class="delete-form"
+                method="POST">
+                @method('DELETE')
+                @csrf
+                <a href="#" class="btn btn-danger ml-3 trigger_button_delete">
+                  Delete
+                </a>
+              </form>
             </div>
           </td>
         </tr>
@@ -82,30 +87,43 @@
 
 <script src="{{ asset('lte/plugins/jquery/jquery.min.js')}}"></script>
 <script>
-  $(function() {
-    $("#example1").DataTable({
-      "responsive": true,
-      "lengthChange": false,
-      "autoWidth": false,
-    }).buttons().container().appendTo('#example1_wrapper .col-md-6:eq(0)');
-  });
-</script>
-
-  @if(Session::has('successEdit'))
-    <script>
-      Swal.fire({
-        title: "Sukses",
-        text: "Sukses Edit Data Bus.",
-        icon: "success",
-        type: "success",
-      });
-    </script>
-  @endif
-
-<script type="text/javascript">
-
   $(document).ready(function() {
-    $('.trigger_button_delete').click(function(e) {
+    var table = $('#example1').DataTable({
+      responsive: {
+        autoWidth: true,
+        details: {
+          display: DataTable.Responsive.display.modal({
+            header: function(row) {
+              var data = row.data();
+              return 'Details for ' + data[2];
+            }
+          }),
+          renderer: DataTable.Responsive.renderer.tableAll()
+        }
+      },
+      columnDefs: [{
+        targets: -1, // Target the last column
+        data: null, // Use the entire row data
+        render: function(data, type, row) {
+          // Use the row data to create the content of the "Actions" column
+          var id = row[1]
+          console.log(row);
+          return `<div style="display: flex; gap: 20px;">
+           <a href="/bus/edit/${id}"
+          class="btn btn-warning" >Edit</a> 
+          <form action="/bus/delete/${id}"
+          method="POST" class="delete-form">
+            @method('DELETE')
+            @csrf
+            <div class = "btn btn-danger trigger_button_delete" rowId="${id}" id="trigger" >
+            Delete </div> </form></div>`;
+        }
+      }]
+    })
+
+    table.column(1).visible(false)
+
+    $(document).on('click', '.trigger_button_delete', function(e) {
       e.preventDefault()
 
       var form = $(this).closest('form.delete-form');
@@ -127,14 +145,25 @@
   })
 </script>
 
+@if(Session::has('successEdit'))
+<script>
+  Swal.fire({
+    title: "Sukses",
+    text: "Sukses Edit Data Bus.",
+    icon: "success",
+    type: "success",
+  });
+</script>
+@endif
+
 @if(Session::has('successDelete'))
-  <script>
-    Swal.fire({
-      title: "Deleted!",
-      text: "Bus Berhasil Di Hapus",
-      icon: "success"
-    });
-  </script>
-  @endif
+<script>
+  Swal.fire({
+    title: "Deleted!",
+    text: "Bus Berhasil Di Hapus",
+    icon: "success"
+  });
+</script>
+@endif
 
 @endsection

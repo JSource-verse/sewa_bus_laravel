@@ -105,10 +105,10 @@ class TransactionController extends Controller
     public function show(Transaction $transaction)
     {
 
-         $website_info = Website::find(1);
+        $website_info = Website::find(1);
 
         if(Auth::user()->role === 'admin') {
-            $data = Transaction::where('status', '!=', 'batal')->where('status', '!=', 'permintaan batal')->get();
+            $data = Transaction::where('status', '!=', 'batal')->where('status', '!=', 'permintaan batal')->orderBy('created_at', 'DESC')->get();
             return view('logged.pages.transaction.index', compact('data', 'website_info'));
         }
 
@@ -121,7 +121,7 @@ class TransactionController extends Controller
      */
     public function edit(Transaction $transaction, $id)
     {
-         $website_info = Website::find(1);
+        $website_info = Website::find(1);
         $data = Transaction::find($id);
         return view('logged.pages.transaction.edit', compact('data', 'website_info'));
     }
@@ -136,11 +136,11 @@ class TransactionController extends Controller
             'status' => 'required|string'
         ]);
 
-         if($request->status === 'batal'){
-             Transaction::where('id', $id)->update([
-                'status' => $request->status,
-                'is_cancel' => 1
-             ]);
+        if($request->status === 'batal') {
+            Transaction::where('id', $id)->update([
+               'status' => $request->status,
+               'is_cancel' => 1
+            ]);
             return redirect('/admin/transaksi')->with('successUpdate', true);
         }
 
@@ -182,7 +182,7 @@ class TransactionController extends Controller
 
     public function show_cancel()
     {
-         $website_info = Website::find(1);
+        $website_info = Website::find(1);
         $data = Transaction::where('is_cancel', 1)->orderBy('created_at', 'desc')->get();
 
         return view('logged.pages.transaction.cancel', compact('data', 'website_info'));

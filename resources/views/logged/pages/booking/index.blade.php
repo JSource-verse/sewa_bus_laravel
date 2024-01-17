@@ -1,6 +1,6 @@
-@extends('logged.layouts.main',  [
-  'nomor_admin' => $website_info->nomor_admin,
-  'sosial_media' => $website_info->sosial_media
+@extends('logged.layouts.main', [
+'nomor_admin' => $website_info->nomor_admin,
+'sosial_media' => $website_info->sosial_media
 ])
 
 
@@ -10,7 +10,11 @@
 <h4>
   Ketentuan Penyewaan Bus
 </h4>
-<iframe src="{{ asset('storage/' . $website_info->sop) }}" width="100%" height="600px" style="border: none;"></iframe>
+<object data="{{ asset('storage/' . $website_info->sop) }}" type="application/pdf" width="100%" height="600px"
+  style="border: none;">
+  <p>Unable to display PDF file. <a target="_blank" href="{{ asset('storage/' . $website_info->sop) }}">Download</a>
+    instead.</p>
+</object>
 @endif
 <div class="content-header">
   <div class="container-fluid">
@@ -88,9 +92,9 @@
 </h4>
 <div class="d-flex flex-wrap" style="gap: 20px;">
   @foreach($website_info->nomor_rekening as $item)
-    @php
-      list($nama, $nomor_rekening, $nama_bank) = explode(' ', $item, 3);
-    @endphp
+  @php
+  list($nama, $nomor_rekening, $nama_bank) = explode(' ', $item, 3);
+  @endphp
   <div class="card" style="width: 18rem;">
     <div class="card-body d-flex flex-column">
       <h5 class="card-title font-weight-bold">
@@ -204,56 +208,56 @@
     });
 
 
-   $('#trigger_form_sewa').click(function (e) {
-    e.preventDefault();
+    $('#trigger_form_sewa').click(function(e) {
+      e.preventDefault();
 
-    var form = $('#formSewa');
+      var form = $('#formSewa');
 
-    var tujuan = $("#tujuan").val();
-    if (tujuan === '') {
+      var tujuan = $("#tujuan").val();
+      if (tujuan === '') {
         Swal.fire({
-            title: "Error!",
-            text: "Tujuan Tidak Boleh Kosong",
-            icon: "error",
+          title: "Error!",
+          text: "Tujuan Tidak Boleh Kosong",
+          icon: "error",
         });
         return; // Hentikan proses lebih lanjut jika validasi gagal
-    }
+      }
 
-    // Validasi tujuan_penjemputan
-    var tujuanPenjemputan = $("#penjemputan").val();
-    if (tujuanPenjemputan === '') {
+      // Validasi tujuan_penjemputan
+      var tujuanPenjemputan = $("#penjemputan").val();
+      if (tujuanPenjemputan === '') {
         Swal.fire({
-            title: "Error!",
-            text: "Penjemputan Tidak Boleh Kosong",
-            icon: "error",
+          title: "Error!",
+          text: "Penjemputan Tidak Boleh Kosong",
+          icon: "error",
         });
         return; // Hentikan proses lebih lanjut jika validasi gagal
-    }
+      }
 
-    // Validasi keterangan
-    var keterangan = $("#keterangan").val();
-    if (keterangan.length < 10) {
+      // Validasi keterangan
+      var keterangan = $("#keterangan").val();
+      if (keterangan.length < 10) {
         Swal.fire({
-            title: "Error!",
-            text: "Keterangan harus minimal 10 karakter",
-            icon: "error",
+          title: "Error!",
+          text: "Keterangan harus minimal 10 karakter",
+          icon: "error",
         });
         return; // Hentikan proses lebih lanjut jika validasi gagal
-    }
+      }
 
-    // Validasi bukti_pembayaran
-    var buktiPembayaran = $(".custom-file-input").val();
-    if (!buktiPembayaran) {
+      // Validasi bukti_pembayaran
+      var buktiPembayaran = $(".custom-file-input").val();
+      if (!buktiPembayaran) {
         Swal.fire({
-            title: "Error!",
-            text: "Pilih file bukti pembayaran",
-            icon: "error",
+          title: "Error!",
+          text: "Pilih file bukti pembayaran",
+          icon: "error",
         });
         return; // Hentikan proses lebih lanjut jika validasi gagal
-    }
+      }
 
-    // Jika semua validasi berhasil, tampilkan konfirmasi SweetAlert
-    Swal.fire({
+      // Jika semua validasi berhasil, tampilkan konfirmasi SweetAlert
+      Swal.fire({
         title: "Data Yang Dimasukan Sudah Benar?",
         text: "Kamu Tidak Bisa Merubah Data Jika Sudah Submit Form",
         icon: "warning",
@@ -262,12 +266,12 @@
         cancelButtonColor: "#d33",
         cancelButtonText: "Batalkan",
         confirmButtonText: "Sudah Benar"
-    }).then((result) => {
+      }).then((result) => {
         if (result.isConfirmed) {
-            form.submit();
+          form.submit();
         }
+      });
     });
-});
 
 
 

@@ -1,6 +1,6 @@
-@extends('logged.layouts.main',  [
-  'nomor_admin' => $website_info->nomor_admin,
-  'sosial_media' => $website_info->sosial_media
+@extends('logged.layouts.main', [
+'nomor_admin' => $website_info->nomor_admin,
+'sosial_media' => $website_info->sosial_media
 ])
 
 @section('content')
@@ -23,6 +23,9 @@
       <thead>
         <tr>
           <th>No</th>
+          <th>
+            id
+          </th>
           <th>Nama Penyewa</th>
           <th>Nama Bus</th>
           <th>Keterangan</th>
@@ -45,6 +48,9 @@
         <tr>
           <td>
             {{ $key + 1 }}
+          </td>
+          <td>
+            {{ $item->id }}
           </td>
           <td>
             {{ $item->user->name }}
@@ -106,27 +112,54 @@
 
 <script src="{{ asset('lte/plugins/jquery/jquery.min.js')}}"></script>
 <script>
-  $(function() {
-    $("#example1").DataTable({
-      "responsive": true,
-      "lengthChange": false,
-      "autoWidth": false,
-    }).buttons().container().appendTo('#example1_wrapper .col-md-6:eq(0)');
-  });
-
   $(document).ready(function() {
-    $('.trigger_button_delete').click(function(e) {
+
+    var table = $('#example1').DataTable({
+      responsive: {
+        autoWidth: true,
+        details: {
+          display: DataTable.Responsive.display.modal({
+            header: function(row) {
+              var data = row.data();
+              return 'Details for ' + data[2];
+            }
+          }),
+          renderer: DataTable.Responsive.renderer.tableAll()
+        }
+      },
+      columnDefs: [{
+        targets: -1, // Target the last column
+        data: null, // Use the entire row data
+        render: function(data, type, row) {
+          // Use the row data to create the content of the "Actions" column
+          var id = row[1]
+          return `<div style="display: flex; gap: 20px;">
+           <a href="/admin/transaksi/edit/${id}"
+          class="btn btn-warning" >Edit</a> 
+          <form action="/admin/transaksi/delete/${id}"
+          method="POST" id="form_delete_transaction">
+            @method('POST')
+            @csrf
+            <div class = "btn btn-danger trigger_button_delete" rowId="${id}" id="trigger" >
+            Delete </div> </form></div>`;
+        }
+      }]
+    })
+
+    table.column(1).visible(false)
+
+    $(document).on('click', '.trigger_button_delete', function(e) {
       e.preventDefault()
 
       var form = $(this).closest('form#form_delete_transaction');
       Swal.fire({
-        title: "Are you sure?",
-        text: "You won't be able to revert this!",
+        title: "Anda Yakin?",
+        text: "Anda tidak bisa mengembalikan data!",
         icon: "warning",
         showCancelButton: true,
         confirmButtonColor: "#3085d6",
         cancelButtonColor: "#d33",
-        confirmButtonText: "Yes, delete it!"
+        confirmButtonText: "Ya, Hapus"
       }).then((result) => {
         if (result.isConfirmed) {
           form.submit();

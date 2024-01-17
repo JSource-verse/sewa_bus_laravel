@@ -11,41 +11,43 @@
     <title>SI-POLAR</title>
 </head>
 <body>
- <div class="wrapper  ">
-    <nav class="nav">
-        <div class="nav-logo">
-        <p><b>SIP-POLAR</b></p>
-        </div>
-    </nav>
-
-
-<!----------------------------- Form box ----------------------------------->
-    <div class="form-box">
-        <div class="login-container" id="login">
-            <h3 style="text-align: center; color: white; margin-bottom: 20px;">
-                Form Forgot Password
-            </h3>
-            <form action="{{ route("password.email") }}" method="post">
-              @csrf
-                <div class="input-box">
-                    <input type="text" name="email" value="{{ old('email') }}" class="input-field" placeholder="Isi dengan Email"">
-                    <i class="bx bx-user"></i>
-                </div>
-                <div class="input-box">
-                    <input type="submit" class="submit" value="Request Forgot Password">
-                </div>
-            </form>
-        </div>
-        <div class="d-flex flex-column-reverse" style="margin-top: 300px; color: white;">
-        <x-validation-errors class="mb-4 d-flex flex-column align-items-center" style="color: white;" />
-
-        @if (session('status'))
-            <div class="mb-4 font-medium text-sm text-green-600">
-                {{ session('status') }}
+    <div class="wrapper  ">
+        <nav class="nav">
+            <div class="nav-logo">
+                <p><b>SIP-POLAR</b></p>
             </div>
-        @endif
+        </nav>
+
+
+        <!----------------------------- Form box ----------------------------------->
+        <div class="form-box">
+            <div class="login-container" id="login">
+                <h3 style="text-align: center; color: white; margin-bottom: 20px;">
+                    Form Forgot Password
+                </h3>
+                <form action="{{ route("password.email") }}" method="post">
+                    @csrf
+                    <div class="input-box">
+                        <input type="text" name="email" value="{{ old('email') }}" class="input-field"
+                            placeholder="Isi dengan Email"">
+                    <i class=" bx bx-user"></i>
+                    </div>
+                    <div class="input-box">
+                        <input type="submit" class="submit" value="Request Forgot Password">
+                    </div>
+                </form>
+            </div>
+             
         </div>
     </div>
-</div>
 </body>
+@if(session('status'))
+<script>
+    Swal.fire({
+        title: "Success!",
+        text: `{{ session('status') }}`,
+        icon: "success",
+    });
+</script>
+@endif
 </html>
