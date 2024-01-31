@@ -14,7 +14,7 @@ class BusController extends Controller
      */
     public function index()
     {
-         $website_info = Website::find(1);
+        $website_info = Website::find(1);
         $data = Bus::orderBy('created_at', 'desc')->get();
         return view('logged.pages.bus.index', compact('data', 'website_info'));
     }
@@ -58,7 +58,7 @@ class BusController extends Controller
      */
     public function show(Bus $bus, $id)
     {
-         $website_info = Website::find(1);
+        $website_info = Website::find(1);
         $bus = Bus::findOrFail($id);
         return view('logged.pages.bus.edit', compact('bus', 'website_info'));
     }
@@ -82,8 +82,9 @@ class BusController extends Controller
 
         $oldPhotoPath = $bus->photo;
 
+
         $validateData = $request->validate([
-            'photo' => 'required|image|mimes:jpeg,png,jpg',
+            'photo' => 'image|mimes:jpeg,png,jpg',
             'nama' => 'required|string',
             'jumlah_kursi' => 'required|numeric',
             'tipe_bus' => 'required|string',

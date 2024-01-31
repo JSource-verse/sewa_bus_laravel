@@ -9,6 +9,7 @@ use App\Models\Bus;
 use App\Models\User;
 use App\Models\Website;
 use Illuminate\Http\Request;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
@@ -102,13 +103,24 @@ class TransactionController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(Transaction $transaction)
+    public function show(Request $request, Transaction $transaction)
     {
 
         $website_info = Website::find(1);
 
         if(Auth::user()->role === 'admin') {
-            $data = Transaction::where('status', '!=', 'batal')->where('status', '!=', 'permintaan batal')->orderBy('created_at', 'DESC')->get();
+            if($request->month) {
+                $data = Transaction::where('status', '!=', ['batal', 'permintaan batal'])
+                    ->whereMonth('created_at', substr($request->month, 5, 2))
+                    ->whereYear('created_at', substr($request->month, 0, 4))
+                    ->orderBy('created_at', 'DESC')->get();
+
+            } else {
+                $data = Transaction::where('status', '!=', ['batal', 'permintaan batal'])
+                    ->whereMonth('created_at', Carbon::now()->month)
+                    ->whereYear('created_at', Carbon::now()->year)
+                    ->orderBy('created_at', 'DESC')->get();
+            }
             return view('logged.pages.transaction.index', compact('data', 'website_info'));
         }
 
@@ -180,10 +192,21 @@ class TransactionController extends Controller
         return redirect()->back()->with('successCancel', true);
     }
 
-    public function show_cancel()
+    public function show_cancel(Request $request)
     {
         $website_info = Website::find(1);
-        $data = Transaction::where('is_cancel', 1)->orderBy('created_at', 'desc')->get();
+    
+        if($request->month) {
+            $data = Transaction::where('is_cancel', 1)
+                ->whereMonth('created_at', substr($request->month, 5, 2))
+                ->whereYear('created_at', substr($request->month, 0, 4))
+                ->orderBy('created_at', 'desc')->get();
+        } else {
+            $data = Transaction::where('is_cancel', 1)
+                ->whereMonth('created_at', Carbon::now()->month)
+                ->whereYear('created_at', Carbon::now()->year)
+                ->orderBy('created_at', 'desc')->get();
+        }
 
         return view('logged.pages.transaction.cancel', compact('data', 'website_info'));
     }

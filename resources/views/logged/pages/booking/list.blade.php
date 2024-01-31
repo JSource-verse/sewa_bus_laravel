@@ -103,10 +103,13 @@
               style="width: 200px;" alt="">
           </td>
           <td>
-            <button type="button" class="btn btn-danger trigger_request_cancel" {{ $item->is_cancel === 0 || now() >=
+            <button class="btn btn-danger trigger_request_cancel" {{ $item->is_cancel === 0 || now() >=
               $item->tanggal_checkout ? '' : 'disabled' }}
               data-id="{{ $item->id }}">
-              Batalkan Sewa
+              Batalkan
+            </button>
+            <button class="btn btn-info">
+              Cetak Nota
             </button>
           </td>
         </tr>
@@ -153,16 +156,17 @@
           }).format(date);
           var dateNow = `${year}-${month}-${day}`;
 
-          console.log(tanggalCheckout === dateNow);
-
 
 
 
           return `<button type="button" class="btn btn-danger trigger_request_cancel"
         ${isCancel || new Date() >= new Date(tanggalCheckout) ? 'disabled' : '' }
         data-id="${id}">
-    Batalkan Sewa
+    Batalkan
 </button>
+ <button class="btn btn-info">
+              Cetak Nota
+            </button>
 `;
         }
       }]

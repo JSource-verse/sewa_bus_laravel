@@ -17,6 +17,14 @@
   </div><!-- /.container-fluid -->
 </div>
 
+<div class="d-flex justify-content-end mb-3">
+  <form id="formFilterMonth">
+     <div >
+      <label class="form-label">Filter Month & Year</label>
+      <input type="month" class="form-control" name="month" value="{{ request('month') }}" id="inputMonth">
+     </div>
+  </form>
+</div>
 <div class="card">
   <div class="card-body">
     <table id="example1" class="table table-bordered table-striped">
@@ -102,14 +110,6 @@
               <a href="{{ route('dashboard.admin.transaction.edit', ['id' => $item->id]) }}" class="btn btn-warning">
                 Edit
               </a>
-              <form action="{{ route('dashboard.admin.transaction.delete', ['id' => $item->id]) }}" method="POST"
-                id="form_delete_transaction">
-                @method('POST')
-                @csrf
-                <div class="btn btn-danger trigger_button_delete" id="trigger">
-                  Delete
-                </div>
-              </form>
             </div>
           </td>
         </tr>
@@ -150,12 +150,7 @@
           return `<div style="display: flex; gap: 20px;">
            <a href="/admin/transaksi/edit/${id}"
           class="btn btn-warning" >Edit</a> 
-          <form action="/admin/transaksi/delete/${id}"
-          method="POST" id="form_delete_transaction">
-            @method('POST')
-            @csrf
-            <div class = "btn btn-danger trigger_button_delete" rowId="${id}" id="trigger" >
-            Delete </div> </form></div>`;
+         </div>`;
         }
       }]
     })
@@ -183,6 +178,10 @@
         }
       });
     });
+
+    $('#inputMonth').change(function (){
+     $('#formFilterMonth').submit()
+    })
 
 
   });
