@@ -13,6 +13,7 @@ use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
+use Barryvdh\DomPDF\Facade\Pdf;
 
 class TransactionController extends Controller
 {
@@ -209,6 +210,34 @@ class TransactionController extends Controller
         }
 
         return view('logged.pages.transaction.cancel', compact('data', 'website_info'));
+    }
+
+    public function generateNota($id)
+    {
+        $sewa = Transaction::find($id);
+
+        $data = [
+            'title' => 'Nota Sewa ' . $sewa->user->name,
+            'date' => Carbon::now(),
+            'sewa' => $sewa,
+            'image' => public_path($sewa->bukti_pembayaran)
+        ];
+
+        $contxt = stream_context_create([
+            'ssl' => [
+                'verify_peer' => false,
+                'verify_peer_name' => false,
+                'allow_self_signed'=> true
+            ]
+        ]);
+
+
+        $pdf = pdf::setOption(['isHtml5ParserEnabled' => true, 'isRemoteEnabled' => true]);
+
+        $pdf = pdf::loadView('logged.pages.transaction.template-nota', $data);
+        $pdfName = 'nota-sewa-' . $sewa->user->name . '.pdf';
+
+        return $pdf->stream($pdfName);
     }
 
 }

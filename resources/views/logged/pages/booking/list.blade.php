@@ -108,9 +108,9 @@
               data-id="{{ $item->id }}">
               Batalkan
             </button>
-            <button class="btn btn-info">
+            <a class="btn btn-info" href="/transaction/cetak-nota/{{ $item->id }}">
               Cetak Nota
-            </button>
+            </a>
           </td>
         </tr>
         @endforeach
@@ -164,9 +164,9 @@
         data-id="${id}">
     Batalkan
 </button>
- <button class="btn btn-info">
+ <a class="btn btn-info" href="/transaction/cetak-nota/${id}">
               Cetak Nota
-            </button>
+            </a>
 `;
         }
       }]

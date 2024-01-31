@@ -112,6 +112,7 @@ Route::middleware(['auth:sanctum', 'web'])->group(function () {
     Route::post('/booking/create', [TransactionController::class, 'store'])->name('dashboard.booking.create');
     Route::get('/booking/check/history', [TransactionController::class, 'show'])->name('dashboard.booking.history');
     Route::post('/booking/cancel/{id}', [TransactionController::class, 'cancel'])->name('dashboard.booking.cancel');
+    Route::get('/transaction/cetak-nota/{id}', [TransactionController::class, 'generateNota']);
 
     // admin
     Route::get('/admin/transaksi', [TransactionController::class, 'show'])->name('dashboard.admin.transaction');
